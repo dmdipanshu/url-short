@@ -286,7 +286,7 @@ body {
 }
 
 .alias-input-wrapper.visible {
-  max-height: 80px;
+  max-height: 350px;
   opacity: 1;
 }
 
@@ -742,6 +742,57 @@ body {
   }
 }
 
+@media (max-width: 480px) {
+  .admin-bar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+  }
+
+  .admin-bar-left {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .alias-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .alias-prefix {
+    text-align: left;
+  }
+
+  .stats-bar {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .modal-overlay {
+    padding: 16px;
+  }
+
+  .modal-card {
+    border-radius: var(--radius-lg);
+  }
+
+  .modal-header {
+    padding: 16px 20px 0;
+  }
+
+  .modal-body {
+    padding: 16px 20px 20px;
+  }
+  
+  .result-card {
+    padding: 16px;
+  }
+}
+
 /* ===== TOAST NOTIFICATION ===== */
 .toast {
   position: fixed;
@@ -1125,8 +1176,10 @@ body {
 }
 
 .qr-image-large {
-  width: 250px;
-  height: 250px;
+  width: 100%;
+  max-width: 250px;
+  height: auto;
+  aspect-ratio: 1 / 1;
   border-radius: var(--radius-md);
   margin: 0 auto;
   display: block;
