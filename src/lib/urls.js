@@ -17,11 +17,41 @@ export async function ensureIndexes() {
   const collection = await getCollection();
   await collection.createIndex({ code: 1 }, { unique: true });
   await collection.createIndex({ createdAt: -1 });
-  // TTL index: auto-delete expired docs 30 days after expiry
-  await collection.createIndex(
-    { expiresAt: 1 },
-    { expireAfterSeconds: 2592000, partialFilterExpression: { expiresAt: { $exists: true, $ne: null } } }
-  );
+  
+  // TTL index: auto-delete expired docs 30 days after expiry.
+  // We use { expiresAt: { $gt: new Date(0) } } because $ne is not supported in partialFilterExpression.
+  try {
+    await collection.createIndex(
+      { expiresAt: 1 },
+      {
+        expireAfterSeconds: 2592000,
+        partialFilterExpression: { expiresAt: { $gt: new Date(0) } },
+      }
+    );
+  } catch (error) {
+    // If the index exists with different options, drop and recreate it
+    if (
+      error.code === 85 ||
+      error.message.includes('IndexOptionsConflict') ||
+      error.message.includes('already exists') ||
+      error.message.includes('IndexKeySpecsConflict')
+    ) {
+      try {
+        await collection.dropIndex('expiresAt_1');
+        await collection.createIndex(
+          { expiresAt: 1 },
+          {
+            expireAfterSeconds: 2592000,
+            partialFilterExpression: { expiresAt: { $gt: new Date(0) } },
+          }
+        );
+      } catch (dropError) {
+        console.error('Failed to recreate expiresAt index:', dropError);
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 /**
