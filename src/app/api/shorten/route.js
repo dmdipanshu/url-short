@@ -76,9 +76,15 @@ export async function POST(request) {
       password: password || null,
     });
 
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || request.headers.get('host');
-    const protocol = baseUrl.startsWith('localhost') ? 'http' : 'https';
-    const shortUrl = `${protocol}://${baseUrl}/${result.code}`;
+    const baseUrlInput = process.env.NEXT_PUBLIC_BASE_URL || request.headers.get('host');
+    let shortUrl;
+    if (baseUrlInput.startsWith('http://') || baseUrlInput.startsWith('https://')) {
+      const cleanBase = baseUrlInput.endsWith('/') ? baseUrlInput.slice(0, -1) : baseUrlInput;
+      shortUrl = `${cleanBase}/${result.code}`;
+    } else {
+      const protocol = baseUrlInput.startsWith('localhost') ? 'http' : 'https';
+      shortUrl = `${protocol}://${baseUrlInput}/${result.code}`;
+    }
 
     return NextResponse.json({
       shortUrl,
